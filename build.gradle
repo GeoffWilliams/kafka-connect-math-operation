@@ -1,0 +1,35 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'java'
+}
+
+group 'me.uk.geoffwilliams'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url "https://packages.confluent.io/maven"
+    }
+}
+
+
+dependencies {
+    compileOnly 'org.apache.kafka:connect-api:3.3.1'
+    compileOnly 'org.apache.kafka:connect-transforms:3.3.1'
+    implementation 'net.objecthunter:exp4j:0.4.8'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// reproducible builds: https://imperceptiblethoughts.com/shadow/configuration/reproducible-builds/
+tasks.withType(AbstractArchiveTask) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
