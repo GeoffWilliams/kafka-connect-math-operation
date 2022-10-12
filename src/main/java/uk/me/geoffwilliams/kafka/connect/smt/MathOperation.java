@@ -74,8 +74,16 @@ public abstract class MathOperation<R extends ConnectRecord<R>> implements Trans
         final Struct updatedValue = new Struct(value.schema());
         final Field connectField = value.schema().field(field);
         final Object origFieldValue = value.get(field);
-        Object updatedFieldValue = doMath(origFieldValue, operator, operand);
-        updatedValue.put(connectField, updatedFieldValue);
+
+        for (Field field : value.schema().fields()) {
+            if (field == connectField) {
+                Object updatedFieldValue = doMath(origFieldValue, operator, operand);
+                updatedValue.put(connectField, updatedFieldValue);
+            } else {
+                updatedValue.put(field.name(), value.get(field));
+            }
+        }
+
 
         return newRecord(record, updatedValue);
     }

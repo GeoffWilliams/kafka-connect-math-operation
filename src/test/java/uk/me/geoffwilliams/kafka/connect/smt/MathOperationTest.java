@@ -99,8 +99,13 @@ public class MathOperationTest {
 
         xform.configure(props);
 
-        final Schema simpleStructSchema = SchemaBuilder.struct().name("name").version(1).doc("doc").field("myfield", Schema.OPTIONAL_INT64_SCHEMA).build();
-        final Struct simpleStruct = new Struct(simpleStructSchema).put("myfield", 1L);
+        final Schema simpleStructSchema = SchemaBuilder.struct().name("name").version(1).doc("doc")
+                .field("myfield", Schema.OPTIONAL_INT64_SCHEMA)
+                .field("another_field", Schema.OPTIONAL_INT64_SCHEMA)
+                .build();
+        final Struct simpleStruct = new Struct(simpleStructSchema)
+                .put("myfield", 1L)
+                .put("another_field", 6L);
 
         final SourceRecord record = new SourceRecord(null, null, "test", 0, simpleStructSchema, simpleStruct);
         final SourceRecord transformedRecord = xform.apply(record);
@@ -112,6 +117,8 @@ public class MathOperationTest {
 
         assertEquals(Schema.OPTIONAL_INT64_SCHEMA, transformedRecord.valueSchema().field("myfield").schema());
         assertEquals(2, ((Struct) transformedRecord.value()).getInt64("myfield"));
+        assertEquals(6, ((Struct) transformedRecord.value()).getInt64("another_field"));
+
     }
 
     @Test
@@ -123,12 +130,15 @@ public class MathOperationTest {
         props.put("field", "myfield");
 
         xform.configure(props);
-
+        final Map<String, Object> data = new HashMap<>();
+        data.put("myfield",1);
+        data.put("another_field",6);
         final SourceRecord record = new SourceRecord(null, null, "test", 0,
-                null, Collections.singletonMap("myfield", 1));
+                null, data);
 
         final SourceRecord transformedRecord = xform.apply(record);
         assertEquals(2, ((Map<?, ?>) transformedRecord.value()).get("myfield"));
+        assertEquals(6, ((Map<?, ?>) transformedRecord.value()).get("another_field"));
     }
 
 }
